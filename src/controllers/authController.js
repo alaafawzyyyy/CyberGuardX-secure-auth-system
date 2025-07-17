@@ -8,7 +8,7 @@ import jwt from "jsonwebtoken";
 
     try{
 
-      const {name , email, password} = req.body;
+      const {name , email, password, role} = req.body;
 
       const existingUser = await User.findOne({email})
       if(existingUser)
@@ -16,7 +16,7 @@ import jwt from "jsonwebtoken";
 
       const hashedPassword = await bcrypt.hash(password, 10)
 
-      const newUser = new User({ name, email, password: hashedPassword});
+      const newUser = new User({ name, email, password: hashedPassword, role});
       await newUser.save()
     
       res.status(200).json({ message: " User registered successfully ✅ "})
@@ -43,7 +43,7 @@ import jwt from "jsonwebtoken";
       if(!isMatch)
         return res.status(400).json({message: "wrong password"})
        
-        const access = accessToken( user._id, user._role );
+        const access = accessToken( user._id, user.role );
         const refresh = refreshToken(user._id);
       
       res.cookie("refreshToken", refresh, {
@@ -90,3 +90,10 @@ import jwt from "jsonwebtoken";
     user: req.user,
   });
 };
+
+
+//admin
+export const isAdmin = (req, res)=>{
+    res.status(200).json({message: "Welcome, admin",
+})
+}
