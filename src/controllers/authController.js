@@ -61,8 +61,8 @@ import jwt from "jsonwebtoken";
     res.status(500).json({ message: "Server error", error: error.message });
   }}
 
-//refresh
 
+//refresh
   export const refreshAccessToken = async(req,res)=>{
     try{
       const token = req.cookies.refreshToken;
@@ -82,3 +82,11 @@ import jwt from "jsonwebtoken";
       res.status(500).json({ message: "Server error", error: error.message });
     }
   }
+
+  
+  //Profile
+  export const getProfile = (req,res)=>{
+    res.status(200).json({message: "Welcome to your profile",
+    user: req.user,
+  });
+};

@@ -12,8 +12,8 @@
         {expiresIn: "7d"}
       )}
 
-      export const newAccessToken = (userId)=>{
-      return jwt.sign({id: userId},
+      export const newAccessToken = (id,role)=>{
+      return jwt.sign({id, role},
         process.env.ACCESS_TOKEN_SECRET,
         {expiresIn: "15m"}
 
