@@ -3,6 +3,7 @@ import mongoose from "mongoose"
 import cors from "cors"
 import dotenv from "dotenv"
 import authRoutes from "./routes/authRoutes.js"
+import cookieParser from "cookie-parser";
 
 
 dotenv.config();
@@ -11,6 +12,8 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
+app.use("/api/auth", authRoutes);
 
 
 app.get("/",(req,res)=>{
@@ -31,4 +34,3 @@ mongoose.connect(process.env.MONGO_URI)
     console.error("❌ Failed to connect to MongoDB:", err)
 })
 
-app.use("/api/auth", authRoutes);
