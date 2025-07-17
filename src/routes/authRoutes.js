@@ -4,10 +4,12 @@ import { validateRegister, verifyAccessToken } from "../middlewares/authmiddlewa
 import { runValidation } from "../middlewares/authmiddleware.js";
 import { validLogin } from "../middlewares/authmiddleware.js";
 import {Admin} from "../middlewares/roleMiddleare.js"
+import { authLimiter } from "../middlewares/rateLimiter.js";
+
 const router = express.Router();
 
-router.post("/register", validateRegister, runValidation, registerUser)
-router.post("/login",  validLogin ,runValidation, loginUser )
+router.post("/register", validateRegister, runValidation, authLimiter, registerUser)
+router.post("/login",  validLogin ,runValidation, authLimiter, loginUser )
 router.post("/refresh", refreshAccessToken)
 router.get("/profile", verifyAccessToken, getProfile )
 router.get("/admin", verifyAccessToken, Admin("admin"), isAdmin)
