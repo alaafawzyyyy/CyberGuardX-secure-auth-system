@@ -1,10 +1,10 @@
 import bcrypt from "bcryptjs"
 import User from "../models/user.js"
+import { accessToken, refreshToken, newAccessToken } from "../utils/generateTokens.js";
 import jwt from "jsonwebtoken";
 
-
-//register
-export const registerUser = async(req,res)=> { 
+  //register
+  export const registerUser = async(req,res)=> { 
 
     try{
 
@@ -28,8 +28,8 @@ export const registerUser = async(req,res)=> {
   }
 
 
-//Login
-export const loginUser = async(req,res)=>{
+  //Login
+  export const loginUser = async(req,res)=>{
 
     try{
 
@@ -43,20 +43,10 @@ export const loginUser = async(req,res)=>{
       if(!isMatch)
         return res.status(400).json({message: "wrong password"})
        
-
-      const accessToken = jwt.sign(
-        {id: user._id, role: user.role},
-        process.env.ACCESS_TOKEN_SECRET,
-        {expiresIn: "15m"}
-      )
-
-      const refreshToken = jwt.sign(
-        {id: user._id},
-        process.env.REFRESH_ACCESS_TOKEN,
-        {expiresIn: "7d"}
-      )
-
-      res.cookie("refreshToken", refreshToken, {
+        const access = accessToken( user._id, user._role );
+        const refresh = refreshToken(user._id);
+      
+      res.cookie("refreshToken", refresh, {
         httpOnly: true,
         secure: process.env.NODE_ENV=== "production",
         sameSite: "strict",
@@ -64,9 +54,31 @@ export const loginUser = async(req,res)=>{
       })
       .json({
         message: "Login successful",
-        accessToken
+        access
       });
-}   catch (error) {
+    }catch (error) {
 
     res.status(500).json({ message: "Server error", error: error.message });
-}}
+  }}
+
+//refresh
+
+  export const refreshAccessToken = async(req,res)=>{
+    try{
+      const token = req.cookies.refreshToken;
+      if (!token) 
+        return res.status(401).json({ message: "No token provided" });
+
+      jwt.verify(token, process.env.REFRESH_ACCESS_TOKEN, (err, decode)=>{
+      if(err)
+        return res.status(401).json({message: "Invalid token"})
+
+      const access = newAccessToken(decode.id)
+      res.json({ accessToken: access });
+
+    });
+  }
+    catch(error){
+      res.status(500).json({ message: "Server error", error: error.message });
+    }
+  }
